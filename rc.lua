@@ -7,7 +7,6 @@ local awful         = require("awful")
                       require("awful.autofocus")
 local wibox         = require("wibox")
 local beautiful     = require("beautiful")
-local naughty       = require("naughty")
 local lain          = require("lain")
 --local menubar       = require("menubar")
 local freedesktop   = require("freedesktop")
@@ -16,39 +15,6 @@ local hotkeys_popup = require("awful.hotkeys_popup")
 local mytable       = awful.util.table or gears.table -- 4.{0,1} compatibility
 
 local switcher      = require("awesome-switcher")
-
--- {{{ Error handling
-
--- Check if awesome encountered an error during startup and fell back to
--- another config (This code will only ever execute for the fallback config)
-if awesome.startup_errors then
-    naughty.notify {
-        preset = naughty.config.presets.critical,
-        title = "Oops, there were errors during startup!",
-        text = awesome.startup_errors
-    }
-end
-
--- Handle runtime errors after startup
-do
-    local in_error = false
-
-    awesome.connect_signal("debug::error", function (err)
-        if in_error then return end
-
-        in_error = true
-
-        naughty.notify {
-            preset = naughty.config.presets.critical,
-            title = "Oops, an error happened!",
-            text = tostring(err)
-        }
-
-        in_error = false
-    end)
-end
-
--- }}}
 
 -- {{{ Autostart windowless processes
 
@@ -79,15 +45,26 @@ local themes = {
     "vertex"           -- 10
 }
 
+-- Notifications
+require("components.notifications")
+
+
 local chosen_theme = themes[6]
 local modkey       = "Mod4"
 local altkey       = "Mod1"
-local terminal     = "alacritty"
+local terminal     = "kitty"
 local vi_focus     = false -- vi-like client focus https://github.com/lcpz/awesome-copycats/issues/275
 local cycle_prev   = true  -- cycle with only the previously focused client or all https://github.com/lcpz/awesome-copycats/issues/274
 local editor       = os.getenv("EDITOR") or "nvim"
-local browser      = "librewolf"
+local browser      = "firefox"
 
+-- TODO:
+local dmenu = string.format("dmenu -i -fn 'Monospace' -nb '%s' -nf '%s' -sb '%s' -sf '%s'",
+                            beautiful.bg_normal, beautiful.fg_normal, beautiful.bg_focus, beautiful.fg_focus)
+
+
+-- j4-dmenu-desktop --dmenu="(cat ; (stest -flx $(echo $PATH | tr : ' ') | sort -u)) | dmenu -i" --term="kitty"
+local menu = ""
 awful.util.terminal = terminal
 awful.util.tagnames = { "meow", "2", "3", "4", "5" }
 awful.layout.layouts = {
@@ -252,7 +229,7 @@ globalkeys = mytable.join(
     --           {description = "destroy all notifications", group = "hotkeys"}),
     -- Take a screenshot
     -- https://github.com/lcpz/dots/blob/master/bin/screenshot
-  awful.key({ }, "Print", function() awful.util.spawn("flameshot gui") end,
+    awful.key({ }, "Print", function() awful.util.spawn("flameshot gui") end,
               {description = "take a screenshot", group = "hotkeys"}),
 
     -- X screen locker
@@ -412,7 +389,7 @@ globalkeys = mytable.join(
               {description = "increase the number of columns", group = "layout"}),
     awful.key({ modkey, "Control" }, "l",     function () awful.tag.incncol(-1, nil, true)    end,
               {description = "decrease the number of columns", group = "layout"}),
-    awful.key({ modkey,           }, "space", function () awful.layout.inc( 1)                end,
+    awful.key({ modkey, "Shift"  }, "space", function () awful.layout.inc( 1)                end,
               {description = "select next", group = "layout"}),
     -- awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(-1)                end,
     --           {description = "select previous", group = "layout"}),
@@ -530,11 +507,13 @@ globalkeys = mytable.join(
     awful.key({ modkey }, "p", function() menubar.show() end,
               {description = "show the menubar", group = "launcher"}),
     --]]
-    awful.key({ modkey }, "d", function ()
-            os.execute(string.format("dmenu_run -i -fn 'Monospace' -nb '%s' -nf '%s' -sb '%s' -sf '%s'",
-            beautiful.bg_normal, beautiful.fg_normal, beautiful.bg_focus, beautiful.fg_focus))
-        end,
-        {description = "show dmenu", group = "launcher"}),
+   awful.key({ modkey }, "d", function ()
+           os.execute("j4-dmenu-desktop --dmenu=\"(cat ; (stest -flx $(echo $PATH | tr : ' ') | sort -u)) | dmenu -i -fn 'Monospace'\" &")
+       end,
+       -- TODO:
+           -- os.execute(string.format("dmenu_run -i -fn 'Monospace' -nb '%s' -nf '%s' -sb '%s' -sf '%s'",
+           --                          beautiful.bg_normal, beautiful.fg_normal, beautiful.bg_focus, beautiful.fg_focus))
+       {description = "show dmenu", group = "launcher"}),
     -- alternatively use rofi, a dmenu-like application with more features
     -- check https://github.com/DaveDavenport/rofi for more details
     --[[ rofi
