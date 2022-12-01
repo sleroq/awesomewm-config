@@ -2,9 +2,11 @@
 -- found (e.g. lgi). If LuaRocks is not installed, do nothing.
 pcall(require, "luarocks.loader")
 
-local gears         = require("gears")
-local awful         = require("awful")
-                      require("awful.autofocus")
+local gears = require("gears")
+local awful = require("awful")
+
+
+require("awful.autofocus")
 local wibox         = require("wibox")
 local beautiful     = require("beautiful")
 local lain          = require("lain")
@@ -12,44 +14,45 @@ local lain          = require("lain")
 local freedesktop   = require("freedesktop")
 local hotkeys_popup = require("awful.hotkeys_popup")
                       require("awful.hotkeys_popup.keys")
-local mytable       = awful.util.table or gears.table -- 4.{0,1} compatibility
 
-local switcher      = require("awesome-switcher")
+local mytable = awful.util.table
 
--- {{{ Autostart windowless processes
+local switcher = require("awesome-switcher")
 
--- This function will run once every time Awesome is started
+-- {{{ Autostart
+
 local function run_once(cmd_arr)
     for _, cmd in ipairs(cmd_arr) do
         awful.spawn.with_shell(string.format("pgrep -u $USER -fx '%s' > /dev/null || (%s)", cmd, cmd))
-        awful.spawn.with_shell("~/.config/awesome/autostart.sh")
     end
 end
 
-run_once({ "urxvtd", "unclutter -root" }) -- comma-separated entries
+-- run_once({})
+awful.spawn.with_shell("~/.config/awesome/autostart.sh")
 
 -- }}}
 
--- {{{ Variable definitions
+-- Variable definitions
 
 local themes = {
-    "blackburn",       -- 1
-    "copland",         -- 2
-    "dremora",         -- 3
-    "holo",            -- 4
-    "multicolor",      -- 5
-    "powerarrow",      -- 6
-    "powerarrow-dark", -- 7
-    "rainbow",         -- 8
-    "steamburn",       -- 9
-    "vertex"           -- 10
+    "blackburn",       -- Pretty tags
+    "copland",         -- Nice
+    "custom",
+    "dremora",         --
+    "holo",            --
+    "multicolor",      --
+    "powerarrow",      --
+    "powerarrow-dark", -- A lot of information
+    "rainbow",         --
+    "steamburn",       --
+    "vertex"           -- Awesome left menu
 }
 
 -- Notifications
 require("components.notifications")
 
+local chosen_theme = themes[3]
 
-local chosen_theme = themes[6]
 local modkey       = "Mod4"
 local altkey       = "Mod1"
 local terminal     = "kitty"
@@ -65,8 +68,9 @@ local dmenu = string.format("dmenu -i -fn 'Monospace' -nb '%s' -nf '%s' -sb '%s'
 
 -- j4-dmenu-desktop --dmenu="(cat ; (stest -flx $(echo $PATH | tr : ' ') | sort -u)) | dmenu -i" --term="kitty"
 local menu = ""
+
 awful.util.terminal = terminal
-awful.util.tagnames = { "meow", "2", "3", "4", "5" }
+awful.util.tagnames = { "1", "2", "3", "4", "5" }
 awful.layout.layouts = {
     awful.layout.suit.tile,
     awful.layout.suit.floating,
@@ -92,25 +96,27 @@ awful.layout.layouts = {
     --lain.layout.termfair.center
 }
 
-lain.layout.termfair.nmaster           = 3
-lain.layout.termfair.ncol              = 1
-lain.layout.termfair.center.nmaster    = 3
-lain.layout.termfair.center.ncol       = 1
-lain.layout.cascade.tile.offset_x      = 2
-lain.layout.cascade.tile.offset_y      = 32
-lain.layout.cascade.tile.extra_padding = 5
-lain.layout.cascade.tile.nmaster       = 5
-lain.layout.cascade.tile.ncol          = 2
+-- lain.layout.termfair.nmaster           = 3
+-- lain.layout.termfair.ncol              = 1
+-- lain.layout.termfair.center.nmaster    = 3
+-- lain.layout.termfair.center.ncol       = 1
+-- lain.layout.cascade.tile.offset_x      = 2
+-- lain.layout.cascade.tile.offset_y      = 32
+-- lain.layout.cascade.tile.extra_padding = 5
+-- lain.layout.cascade.tile.nmaster       = 5
+-- lain.layout.cascade.tile.ncol          = 2
 
 awful.util.taglist_buttons = mytable.join(
     awful.button({ }, 1, function(t) t:view_only() end),
     awful.button({ modkey }, 1, function(t)
         if client.focus then client.focus:move_to_tag(t) end
     end),
+
     awful.button({ }, 3, awful.tag.viewtoggle),
     awful.button({ modkey }, 3, function(t)
         if client.focus then client.focus:toggle_tag(t) end
     end),
+
     awful.button({ }, 4, function(t) awful.tag.viewnext(t.screen) end),
     awful.button({ }, 5, function(t) awful.tag.viewprev(t.screen) end)
 )
@@ -131,51 +137,6 @@ awful.util.tasklist_buttons = mytable.join(
 )
 
 beautiful.init(string.format("%s/.config/awesome/themes/%s/theme.lua", os.getenv("HOME"), chosen_theme))
-
--- }}}
-
--- {{{ Menu
-
--- Create a launcher widget and a main menu
-local myawesomemenu = {
-   { "Hotkeys", function() hotkeys_popup.show_help(nil, awful.screen.focused()) end },
-   { "Manual", string.format("%s -e man awesome", terminal) },
-   { "Edit config", string.format("%s -e %s %s", terminal, editor, awesome.conffile) },
-   { "Restart", awesome.restart },
-   { "Quit", function() awesome.quit() end },
-}
-
-awful.util.mymainmenu = freedesktop.menu.build {
-    before = {
-        { "Awesome", myawesomemenu, beautiful.awesome_icon },
-        -- other triads can be put here
-    },
-    after = {
-        { "Open terminal", terminal },
-        -- other triads can be put here
-    }
-}
-
--- Hide the menu when the mouse leaves it
---[[
-awful.util.mymainmenu.wibox:connect_signal("mouse::leave", function()
-    if not awful.util.mymainmenu.active_child or
-       (awful.util.mymainmenu.wibox ~= mouse.current_wibox and
-       awful.util.mymainmenu.active_child.wibox ~= mouse.current_wibox) then
-        awful.util.mymainmenu:hide()
-    else
-        awful.util.mymainmenu.active_child.wibox:connect_signal("mouse::leave",
-        function()
-            if awful.util.mymainmenu.wibox ~= mouse.current_wibox then
-                awful.util.mymainmenu:hide()
-            end
-        end)
-    end
-end)
---]]
-
--- Set the Menubar terminal for applications that require it
---menubar.utils.terminal = terminal
 
 -- }}}
 
@@ -347,9 +308,9 @@ globalkeys = mytable.join(
         {description = "toggle wibox", group = "awesome"}),
 
     -- On-the-fly useless gaps change
-    awful.key({ altkey, "Control" }, "=", function () lain.util.useless_gaps_resize(1) end,
+    awful.key({ modkey, "Control" }, "=", function () lain.util.useless_gaps_resize(1) end,
               {description = "increment useless gaps", group = "tag"}),
-    awful.key({ altkey, "Control" }, "-", function () lain.util.useless_gaps_resize(-1) end,
+    awful.key({ modkey, "Control" }, "-", function () lain.util.useless_gaps_resize(-1) end,
               {description = "decrement useless gaps", group = "tag"}),
 
     -- Dynamic tagging
@@ -407,13 +368,6 @@ globalkeys = mytable.join(
     --           {description = "dropdown application", group = "launcher"}),
 
     -- Widgets popups
-    -- awful.key({ altkey, }, "c", function () if beautiful.cal then beautiful.cal.show(7) end end,
-    --           {description = "show calendar", group = "widgets"}),
-    -- awful.key({ altkey, }, "h", function () if beautiful.fs then beautiful.fs.show(7) end end,
-    --           {description = "show filesystem", group = "widgets"}),
-    -- awful.key({ altkey, }, "w", function () if beautiful.weather then beautiful.weather.show(7) end end,
-    --           {description = "show weather", group = "widgets"}),
-
     -- Screen brightness
     -- awful.key({ }, "XF86MonBrightnessUp", function () os.execute("xbacklight -inc 10") end,
     --           {description = "+10%", group = "hotkeys"}),
@@ -452,45 +406,6 @@ globalkeys = mytable.join(
     --     end,
     --     {description = "volume 0%", group = "hotkeys"}),
 
-    -- MPD control
-    awful.key({ altkey, "Control" }, "Up",
-        function ()
-            os.execute("mpc toggle")
-            beautiful.mpd.update()
-        end,
-        {description = "mpc toggle", group = "widgets"}),
-    awful.key({ altkey, "Control" }, "Down",
-        function ()
-            os.execute("mpc stop")
-            beautiful.mpd.update()
-        end,
-        {description = "mpc stop", group = "widgets"}),
-    awful.key({ altkey, "Control" }, "Left",
-        function ()
-            os.execute("mpc prev")
-            beautiful.mpd.update()
-        end,
-        {description = "mpc prev", group = "widgets"}),
-    awful.key({ altkey, "Control" }, "Right",
-        function ()
-            os.execute("mpc next")
-            beautiful.mpd.update()
-        end,
-        {description = "mpc next", group = "widgets"}),
-    awful.key({ altkey }, "0",
-        function ()
-            local common = { text = "MPD widget ", position = "top_middle", timeout = 2 }
-            if beautiful.mpd.timer.started then
-                beautiful.mpd.timer:stop()
-                common.text = common.text .. lain.util.markup.bold("OFF")
-            else
-                beautiful.mpd.timer:start()
-                common.text = common.text .. lain.util.markup.bold("ON")
-            end
-            naughty.notify(common)
-        end,
-        {description = "mpc on/off", group = "widgets"}),
-
     -- -- Copy primary to clipboard (terminals to gtk)
     -- awful.key({ modkey }, "c", function () awful.spawn.with_shell("xsel | xsel -i -b") end,
     --           {description = "copy terminal to gtk", group = "hotkeys"}),
@@ -499,45 +414,14 @@ globalkeys = mytable.join(
     --           {description = "copy gtk to terminal", group = "hotkeys"}),
 
     -- User programs
-    awful.key({ modkey }, "e", function () awful.spawn("pcmanfm") end,
+    awful.key({ modkey }, "e", function () awful.spawn("dolphin") end,
               {description = "run file manager", group = "launcher"}),
 
-    -- Default
-    --[[ Menubar
-    awful.key({ modkey }, "p", function() menubar.show() end,
-              {description = "show the menubar", group = "launcher"}),
-    --]]
    awful.key({ modkey }, "d", function ()
            os.execute("j4-dmenu-desktop --dmenu=\"(cat ; (stest -flx $(echo $PATH | tr : ' ') | sort -u)) | dmenu -i -fn 'Monospace'\" &")
        end,
        -- TODO:
-           -- os.execute(string.format("dmenu_run -i -fn 'Monospace' -nb '%s' -nf '%s' -sb '%s' -sf '%s'",
-           --                          beautiful.bg_normal, beautiful.fg_normal, beautiful.bg_focus, beautiful.fg_focus))
-       {description = "show dmenu", group = "launcher"}),
-    -- alternatively use rofi, a dmenu-like application with more features
-    -- check https://github.com/DaveDavenport/rofi for more details
-    --[[ rofi
-    awful.key({ modkey }, "x", function ()
-            os.execute(string.format("rofi -show %s -theme %s",
-            'run', 'dmenu'))
-        end,
-        {description = "show rofi", group = "launcher"}),
-    --]]
-    -- Prompt
-    awful.key({ modkey }, "r", function () awful.screen.focused().mypromptbox:run() end,
-              {description = "run prompt", group = "launcher"}),
-
-    awful.key({ modkey }, "x",
-              function ()
-                  awful.prompt.run {
-                    prompt       = "Run Lua code: ",
-                    textbox      = awful.screen.focused().mypromptbox.widget,
-                    exe_callback = awful.util.eval,
-                    history_path = awful.util.get_cache_dir() .. "/history_eval"
-                  }
-              end,
-              {description = "lua execute prompt", group = "awesome"})
-    --]]
+       {description = "show dmenu", group = "launcher"})
 )
 
 clientkeys = mytable.join(
@@ -657,64 +541,7 @@ root.keys(globalkeys)
 
 -- {{{ Rules
 
--- Rules to apply to new clients (through the "manage" signal).
-awful.rules.rules = {
-    -- All clients will match this rule.
-    { rule = { },
-      properties = { border_width = beautiful.border_width,
-                     border_color = beautiful.border_normal,
-                     callback = awful.client.setslave,
-                     focus = awful.client.focus.filter,
-                     raise = true,
-                     keys = clientkeys,
-                     buttons = clientbuttons,
-                     screen = awful.screen.preferred,
-                     -- placement = awful.placement.no_overlap+awful.placement.no_offscreen,
-                     placement = awful.placement.no_overlap + awful.placement.centered,
-                     size_hints_honor = false
-     }
-    },
-
-    -- Floating clients.
-    { rule_any = {
-        instance = {
-          "DTA",  -- Firefox addon DownThemAll.
-          "copyq",  -- Includes session name in class.
-          "pinentry",
-        },
-        class = {
-          "Arandr",
-          "Blueman-manager",
-          "Gpick",
-          "Kruler",
-          "MessageWin",  -- kalarm.
-          "Sxiv",
-          "Tor Browser", -- Needs a fixed window size to avoid fingerprinting by screen size.
-          "Wpa_gui",
-          "veromix",
-          "xtightvncviewer"},
-
-        -- Note that the name property shown in xprop might be set slightly after creation of the client
-        -- and the name shown there might not match defined rules here.
-        name = {
-          "Event Tester",  -- xev.
-        },
-        role = {
-          "AlarmWindow",  -- Thunderbird's calendar.
-          "ConfigManager",  -- Thunderbird's about:config.
-          "pop-up",       -- e.g. Google Chrome's (detached) Developer Tools.
-        }
-      }, properties = { floating = true }},
-
-    -- Add titlebars to normal clients and dialogs
-    { rule_any = {type = { "normal", "dialog" }
-      }, properties = { titlebars_enabled = true }
-    },
-
-    -- Set Firefox to always map on the tag named "2" on screen 1.
-    -- { rule = { class = "Firefox" },
-    --   properties = { screen = 1, tag = "2" } },
-}
+require('components.rules')
 
 -- }}}
 

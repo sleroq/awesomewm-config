@@ -1,8 +1,9 @@
+local gears = require("gears")
+local awful = require("awful")
+
 local naughty = require("naughty")
 local beautiful = require("beautiful")
-local gears = require("gears")
-local wibox = require("wibox")
-local awful = require("awful")
+-- local wibox = require("wibox")
 local dpi = beautiful.xresources.apply_dpi
 
 
@@ -24,13 +25,13 @@ end
 naughty.config.padding = dpi(7)
 naughty.config.spacing = dpi(7)
 naughty.config.icon_dirs = {
-   "/usr/share/icons/Tela-dark",
+   "/usr/share/icons/breeze-dark",
    "/usr/share/pixmaps/"
 }
 naughty.config.icon_formats = {"png", "svg"}
 
 -- Timeouts
-naughty.config.presets.low.timeout = 3
+naughty.config.presets.low.timeout = 2
 naughty.config.presets.critical.timeout = 0
 
 naughty.config.presets.normal = {
