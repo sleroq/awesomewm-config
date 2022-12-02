@@ -1,6 +1,6 @@
 --[[
 
-     Vertex Awesome WM theme
+     Forked from Vertex Awesome WM theme
      github.com/lcpz
 
 --]]
@@ -16,8 +16,8 @@ local my_table = awful.util.table or gears.table -- 4.{0,1} compatibility
 
 local theme                                     = {}
 theme.default_dir                               = require("awful.util").get_themes_dir() .. "default"
-theme.icon_dir                                  = os.getenv("HOME") .. "/.config/awesome/themes/vertex/icons"
-theme.wallpaper                                 = os.getenv("HOME") .. "/.config/awesome/themes/vertex/wall.png"
+theme.icon_dir                                  = os.getenv("HOME") .. "/.config/awesome/themes/custom/icons"
+theme.wallpaper                                 = os.getenv("HOME") .. "/.config/awesome/themes/custom/wall.png"
 theme.font                                      = "Comfortaa Bold 10"
 theme.taglist_font                              = "FontAwesome 17"
 theme.fg_normal                                 = "#FFFFFF"
