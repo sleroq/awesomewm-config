@@ -368,6 +368,14 @@ globalkeys = mytable.join(
     --           {description = "-10%", group = "hotkeys"}),
 
     -- ALSA volume control
+    awful.key({ modkey, "Shift" }, "t",
+        function ()
+            os.execute("$HOME/develop/other/dotfiles/scripts/touchpad_toggle &")
+            beautiful.volume.update()
+        end,
+        {description = "toggle touchpad", group = "hotkeys"}),
+
+    -- ALSA volume control
     awful.key({ }, "XF86AudioRaiseVolume",
         function ()
             os.execute(string.format("amixer -q set %s 1%%+", beautiful.volume.channel))
