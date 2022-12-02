@@ -38,14 +38,7 @@ local themes = {
     "blackburn",       -- Pretty tags
     "copland",         -- Nice
     "custom",
-    "dremora",         --
-    "holo",            --
-    "multicolor",      --
-    "powerarrow",      --
     "powerarrow-dark", -- A lot of information
-    "rainbow",         --
-    "steamburn",       --
-    "vertex"           -- Awesome left menu
 }
 
 -- Notifications
