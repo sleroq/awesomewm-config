@@ -1,6 +1,6 @@
 --[[
 
-     Forked from Vertex Awesome WM theme
+     Vertex Awesome WM theme
      github.com/lcpz
 
 --]]
@@ -34,7 +34,6 @@ theme.tooltip_border_color                      = theme.fg_focus
 theme.tooltip_border_width                      = theme.border_width
 theme.menu_height                               = dpi(24)
 theme.menu_width                                = dpi(140)
-theme.awesome_icon                              = theme.icon_dir .. "/awesome.png"
 theme.taglist_squares_sel                       = gears.surface.load_from_shape(dpi(3), dpi(30), gears.shape.rectangle, theme.fg_focus)
 theme.taglist_squares_unsel                     = gears.surface.load_from_shape(dpi(3), dpi(30), gears.shape.rectangle, theme.bg_focus2)
 theme.panelbg                                   = theme.icon_dir .. "/panel.png"
@@ -285,7 +284,7 @@ theme.weather = lain.widget.weather({
 --]]
 
 -- Launcher
-local mylauncher = awful.widget.button({image = theme.awesome_icon})
+local mylauncher = awful.widget.button()
 mylauncher:connect_signal("button::press", function() awful.util.mymainmenu:toggle() end)
 
 -- Separators
@@ -355,7 +354,6 @@ function theme.vertical_wibox(s)
         local s = awful.screen.focused()
         s.myleftwibox.width = dpi(9)
         s.layoutb.visible = false
-        mylauncher.visible = false
         if s.docktimer.started then
             s.docktimer:stop()
         end
