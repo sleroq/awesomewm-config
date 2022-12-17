@@ -14,6 +14,8 @@ run pasystray	# sound control
 run xset r rate 250 25
 # run exec setxkbmap -layout us,ru -option grp:lctrl_lwin_toggle
 
+# Polkit
+run /usr/lib/polkit-kde-authentication-agent-1
 
 # other
 run ~/develop/other/scripts/autostart.sh
