@@ -11,7 +11,6 @@ local wibox         = require("wibox")
 local beautiful     = require("beautiful")
 local lain          = require("lain")
 --local menubar       = require("menubar")
-local freedesktop   = require("freedesktop")
 local hotkeys_popup = require("awful.hotkeys_popup")
                       require("awful.hotkeys_popup.keys")
 
