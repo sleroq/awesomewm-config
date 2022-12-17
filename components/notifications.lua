@@ -13,7 +13,7 @@ local dpi = beautiful.xresources.apply_dpi
 naughty.config.defaults.ontop = true
 naughty.config.defaults.icon_size = dpi(32)
 naughty.config.defaults.screen = awful.screen.focused()
-naughty.config.defaults.timeout = 3
+naughty.config.defaults.timeout = 2
 naughty.config.defaults.title = "System Notification"
 naughty.config.defaults.margin = dpi(16)
 naughty.config.defaults.border_width = 0
@@ -32,7 +32,7 @@ naughty.config.icon_formats = {"png", "svg"}
 
 -- Timeouts
 naughty.config.presets.low.timeout = 2
-naughty.config.presets.critical.timeout = 0
+naughty.config.presets.critical.timeout = 10
 
 naughty.config.presets.normal = {
    font = beautiful.title_font,
