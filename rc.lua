@@ -414,7 +414,7 @@ globalkeys = mytable.join(
     --           {description = "copy gtk to terminal", group = "hotkeys"}),
 
     -- User programs
-    awful.key({ modkey }, "e", function () awful.spawn("dolphin") end,
+    awful.key({ modkey }, "e", function () awful.spawn("thunar") end,
               {description = "run file manager", group = "launcher"}),
 
    awful.key({ modkey }, "d", function ()
