@@ -29,6 +29,8 @@ end
 -- run_once({})
 awful.spawn.with_shell("~/.config/awesome/autostart.sh")
 
+local screen_temp = 5000
+awful.spawn.with_shell(string.format("sct %s", screen_temp))
 -- }}}
 
 -- Variable definitions
@@ -365,6 +367,20 @@ globalkeys = mytable.join(
     --           {description = "+10%", group = "hotkeys"}),
     -- awful.key({ }, "XF86MonBrightnessDown", function () os.execute("xbacklight -dec 10") end,
     --           {description = "-10%", group = "hotkeys"}),
+
+    -- Screen temperature
+    awful.key({ }, "XF86MonBrightnessUp",
+        function ()
+            screen_temp = screen_temp + 200
+            os.execute(string.format("sct %s", screen_temp))
+        end,
+        {description = "+200", group = "hotkeys"}),
+    awful.key({ }, "XF86MonBrightnessDown",
+        function ()
+            screen_temp = screen_temp - 200
+            os.execute(string.format("sct %s", screen_temp))
+        end,
+        {description = "-200", group = "hotkeys"}),
 
     -- ALSA volume control
     awful.key({ modkey, "Shift" }, "t",
